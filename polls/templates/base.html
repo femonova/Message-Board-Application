@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Femi's Discussion application</title>
+    </head>
+
+    <body>
+        <div>
+            <a href="{% url 'polls:index' %}" >Wanna go home?</a>
+            <a href="{% url 'log_me_out' %}" style="float:right;">Logout?</a>
+        </div>
+
+    {% block content %}{% endblock content %}
+    </body>
+</html>

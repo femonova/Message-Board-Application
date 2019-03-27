@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ question.question_text }}</h1>
+<h3>Posted on {{question.pub_date}}</h3>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="{% url 'polls:vote' question.id %}" id = "usrform" method="post">{% csrf_token %}</form>
+    {% csrf_token %}
+    {% for choice in question.comments_set.all %}
+    <div id="divID{{choice.id}}">
+
+        <form action="{% url 'polls:upvote_me' choice.id %}" id = "upvote_button{{choice.id}}" style="display:inline" method="post">
+            {% csrf_token %}
+            <input type="submit" value="{{choice.upvotes}}" id="commentID{{choice.id}}" form="upvote_button{{choice.id}}">
+        </form>
+
+        <p style="display:inline"> {{ choice.comment_text }} </p>
+    </div>
+    <br>
+    {% endfor %}
+    <textarea rows="4" cols="50" name="usr_comment" form="usrform">Enter text here...</textarea>
+    <div>
+        <input type="submit" value="Comment!" style="float:left;" form="usrform">
+    </div>
+
+    {% endblock content %}
+

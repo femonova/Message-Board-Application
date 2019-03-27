@@ -1,0 +1,71 @@
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
+from .models import Question
+from django.template import loader
+from django.views import generic
+from django.urls import reverse
+# Create your views here.
+#All Django wants is an HttpResponse
+
+class IndexView(generic.ListView):
+    template_name = 'polls/index.html'
+    context_object_name = 'latest_question_list'
+
+    def get_queryset(self):
+        return Question.objects.order_by('-pub_date')[:5]
+
+class DetailView(generic.DetailView):
+    model = Question
+    template_name = 'polls/detail.html'
+
+class ResultsView(generic.DetailView):
+    model = Question
+    template_name = 'polls/results.html'
+
+def index_old(request):
+    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    #output = ', '.join([q.question_text for q in latest_question_list])
+    template = loader.get_template('polls/index.html')
+
+    #Context maps template variable names to python objects
+    context = {
+        'latest_question_list': latest_question_list,        
+    }
+    return HttpResponse(template.render(context, request))
+    #return HttpResponse(output)
+   # return HttpResponse("Hello, World! You are at the polls index.")
+
+#Note: render returns HttpResponse and no need for loader using render! It's just a shortcut!
+def index(request):
+    latest_question_list = Question.objects.order_by('-pub_date')[:5]
+    context = {'latest_question_list':latest_question_list}
+    return render(request, 'polls/index.html', context)
+
+def detail_old(request, question_id):
+    try:
+        question = Question.object.get(pk = question_id)
+    except Question.DoesNotExist:
+        raise Http404('Question does not exist!')
+    return render(request, 'polls/detail.html', {'question' : question})
+
+def detail_old2(request, question_id):
+    question = get_object_or_404(Question, pk = question_id)
+    return render(request, 'polls/detail.html', {'question' : question})
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+def vote(request, question_id):
+    question = get_object_or_404(Question, pk = question_id)
+    user_response = request.POST['usr_comment'] #Grab user comment
+ 
+    if(user_response == ''):
+        return render(request, 'polls/detail.html', {
+        'question' : question,
+        'error_message' : "No comment provided" #Prehaps restrict submission before sending post?
+    })
+    else: 
+        question.comments_set.create(comment_text = user_response, upvotes = 0) #Associates question with comments
+        return HttpResponseRedirect(reverse('polls:detail', args=(question_id, ))) 

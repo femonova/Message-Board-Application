@@ -1,0 +1,27 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<!--Must be here, apparently-->
+<div style="margin-top:10px">
+    <h1>Homepage</h1>
+</div>
+
+    {% if latest_question_list %}
+        <ul>
+        {% for question in latest_question_list %}
+        <li> <a href = "{% url 'polls:detail' question.id %}"> {{ question.question_text }} </a> </li>	
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No polls are available.</p>
+    {% endif %}
+
+    <!--Pass in data and grab it w/ request.POST['usr_comment']-->
+    <form action="{% url 'polls:user_submit_question' %}" id="sub_comment" method="POST">{% csrf_token %}</form>
+    <textarea rows="4" cols="50" name="usr_comment" form="sub_comment">Got something on your mind?</textarea>
+    <div>
+        <input type="submit" value="Submit Post!" style="float:left;" form="sub_comment">
+    </div>
+
+{% endblock content %}
